@@ -12,39 +12,62 @@ serve(async (req) => {
   }
 
   try {
-    const { basicInfo } = await req.json();
+    const { basicInfo, language = 'fr' } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY not configured');
     }
 
-    const prompt = `Tu es un expert en rédaction de CV. Génère un CV professionnel complet basé sur ces informations minimales:
-    
-Nom: ${basicInfo.name || 'Non spécifié'}
-Email: ${basicInfo.email || 'Non spécifié'}
-Téléphone: ${basicInfo.phone || 'Non spécifié'}
-Titre/Poste: ${basicInfo.title || 'Non spécifié'}
-Expérience: ${basicInfo.experience || 'Non spécifié'}
-Formation: ${basicInfo.education || 'Non spécifié'}
+    const promptFr = `Tu es un expert en rédaction de CV. Génère uniquement les SECTIONS demandées sans inventer d'informations personnelles. Utilise le français.
 
-Développe ce CV avec:
-- Un résumé professionnel engageant (2-3 phrases)
-- 3-4 expériences professionnelles détaillées avec responsabilités et réalisations
-- 2-3 formations avec détails
-- 6-8 compétences clés pertinentes
-- 2-3 langues avec niveaux
-- 2-3 centres d'intérêt professionnels
+Nom: ${basicInfo.name || ''}
+Email: ${basicInfo.email || ''}
+Téléphone: ${basicInfo.phone || ''}
+Titre/Poste: ${basicInfo.title || ''}
+Expérience (indice libre): ${basicInfo.experience || ''}
+Formation (indice libre): ${basicInfo.education || ''}
 
-Retourne UNIQUEMENT un JSON valide au format suivant (sans markdown ni texte supplémentaire):
+Règles STRICTES:
+- N'invente JAMAIS d'entreprises, de dates, d'écoles ou de diplômes
+- Si une info n'est pas fournie, laisse les tableaux vides et n'ajoute pas d'éléments fictifs
+- Le résumé doit rester générique et lié au titre (sans détails inventés)
+
+Retourne UNIQUEMENT un JSON valide au format:
 {
   "summary": "string",
-  "experience": [{"title": "string", "company": "string", "period": "string", "description": "string"}],
-  "education": [{"degree": "string", "school": "string", "year": "string"}],
-  "skills": ["string"],
-  "languages": [{"language": "string", "level": "string"}],
-  "interests": ["string"]
+  "experience": [],
+  "education": [],
+  "skills": [],
+  "languages": [],
+  "interests": []
 }`;
+
+    const promptEn = `You are a resume expert. Generate ONLY the REQUESTED SECTIONS without fabricating any personal details. Use English.
+
+Name: ${basicInfo.name || ''}
+Email: ${basicInfo.email || ''}
+Phone: ${basicInfo.phone || ''}
+Title: ${basicInfo.title || ''}
+Experience (free hint): ${basicInfo.experience || ''}
+Education (free hint): ${basicInfo.education || ''}
+
+STRICT Rules:
+- NEVER invent companies, dates, schools, or degrees
+- If info is missing, keep arrays empty and do NOT add made-up items
+- Summary must be generic and tied to the title (no fabricated specifics)
+
+Return ONLY valid JSON in this shape:
+{
+  "summary": "string",
+  "experience": [],
+  "education": [],
+  "skills": [],
+  "languages": [],
+  "interests": []
+}`;
+
+    const prompt = language === 'en' ? promptEn : promptFr;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -55,7 +78,7 @@ Retourne UNIQUEMENT un JSON valide au format suivant (sans markdown ni texte sup
       body: JSON.stringify({
         model: 'google/gemini-2.5-flash',
         messages: [
-          { role: 'system', content: 'Tu es un expert en rédaction de CV. Réponds UNIQUEMENT avec du JSON valide, sans markdown.' },
+          { role: 'system', content: language === 'en' ? 'You are a resume writing expert. Respond ONLY with valid JSON, no markdown.' : 'Tu es un expert en rédaction de CV. Réponds UNIQUEMENT avec du JSON valide, sans markdown.' },
           { role: 'user', content: prompt }
         ],
       }),

@@ -24,8 +24,8 @@ const Index = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 animate-scale-in">
           <div className="p-6 rounded-xl bg-card border border-border hover:shadow-[var(--shadow-elegant)] transition-all duration-300 hover:scale-105">
             <Sparkles className="w-8 h-8 text-primary mx-auto mb-4" />
-            <h3 className="font-semibold text-lg mb-2">Design Moderne</h3>
-            <p className="text-sm text-muted-foreground">Interface violet/blanc avec animations fluides</p>
+            <h3 className="font-semibold text-lg mb-2">Assistant IA</h3>
+            <p className="text-sm text-muted-foreground">Générez votre CV à l'aide de l'IA, simplement</p>
           </div>
 
           <div className="p-6 rounded-xl bg-card border border-border hover:shadow-[var(--shadow-elegant)] transition-all duration-300 hover:scale-105">

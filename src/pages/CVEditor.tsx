@@ -28,6 +28,7 @@ const CVEditor = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [step, setStep] = useState<'form' | 'generate' | 'template' | 'customize' | 'preview'>('form');
+  const [language, setLanguage] = useState<'fr' | 'en'>('fr');
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState(0);
@@ -123,10 +124,16 @@ const CVEditor = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke('generate-cv-content', {
-        body: { basicInfo }
+        body: { basicInfo, language }
       });
 
       if (error) throw error;
+
+      if (!data?.cvData) {
+        throw new Error('Réponse IA invalide');
+      }
+
+      const safe = data.cvData || {};
 
       setCvData({
         name: basicInfo.name,
@@ -134,7 +141,12 @@ const CVEditor = () => {
         phone: basicInfo.phone,
         title: basicInfo.title,
         photo: photoUrl,
-        ...data.cvData
+        summary: typeof safe.summary === 'string' ? safe.summary : '',
+        experience: Array.isArray(safe.experience) ? safe.experience : [],
+        education: Array.isArray(safe.education) ? safe.education : [],
+        skills: Array.isArray(safe.skills) ? safe.skills : [],
+        languages: Array.isArray(safe.languages) ? safe.languages : [],
+        interests: Array.isArray(safe.interests) ? safe.interests : [],
       });
 
       toast({
@@ -254,9 +266,33 @@ const CVEditor = () => {
           <div className="max-w-2xl w-full bg-card rounded-lg shadow-elegant p-8 space-y-6">
             <div className="text-center mb-6">
               <h1 className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-2">
-                Créez votre CV professionnel
+                Créez votre CV avec l'assistant IA
               </h1>
-              <p className="text-muted-foreground">Quelques infos, et l'IA fait le reste ✨</p>
+              <p className="text-muted-foreground">Donnez le minimum, l'IA s'occupe du reste (sans rien inventer)</p>
+            </div>
+
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Langue:</span>
+                <div className="inline-flex rounded-md border">
+                  <button
+                    onClick={() => setLanguage('fr')}
+                    className={`px-3 py-1 text-sm ${language === 'fr' ? 'bg-primary text-primary-foreground' : ''}`}
+                  >FR</button>
+                  <button
+                    onClick={() => setLanguage('en')}
+                    className={`px-3 py-1 text-sm ${language === 'en' ? 'bg-primary text-primary-foreground' : ''}`}
+                  >EN</button>
+                </div>
+              </div>
+              <Button variant="outline" onClick={() => {
+                setBasicInfo({ name: '', email: '', phone: '', title: '', experience: '', education: '' });
+                setCvData({ name: '', email: '', phone: '', title: '', photo: '', summary: '', experience: [], education: [], skills: [], languages: [], interests: [] });
+                setPhotoUrl('');
+                setSelectedTemplate(0);
+                setSelectedColor(0);
+                setStep('form');
+              }}>Tout remettre à zéro</Button>
             </div>
 
             <div className="space-y-4">
