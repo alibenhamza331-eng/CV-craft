@@ -11,6 +11,7 @@ import CVTemplate2 from "@/components/cv/CVTemplate2";
 import CVTemplate3 from "@/components/cv/CVTemplate3";
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import type { CVData } from '@/types/cv';
 
 const templates = [CVTemplate1, CVTemplate2, CVTemplate3];
 const colorPalettes = [
@@ -42,7 +43,7 @@ const CVEditor = () => {
     education: "",
   });
 
-  const [cvData, setCvData] = useState<any>({
+  const [cvData, setCvData] = useState<CVData>({
     name: "",
     email: "",
     phone: "",
@@ -72,8 +73,19 @@ const CVEditor = () => {
 
       if (error) throw error;
       if (data) {
-        setCvData(data.content);
-        setPhotoUrl(data.content.photo || "");
+        setCvData({
+          name: data.full_name,
+          email: data.email,
+          phone: data.phone || "",
+          title: data.title,
+          photo: "",
+          summary: data.summary || "",
+          experience: (data.experience as any) || [],
+          education: (data.education as any) || [],
+          skills: (data.skills as any) || [],
+          languages: (data.languages as any) || [],
+          interests: [],
+        });
         setStep('preview');
       }
     } catch (error: any) {
@@ -155,8 +167,15 @@ const CVEditor = () => {
 
       const cvToSave = {
         user_id: user.id,
-        title: cvData.name || "Mon CV",
-        content: { ...cvData, photo: photoUrl },
+        full_name: cvData.name,
+        email: cvData.email,
+        phone: cvData.phone,
+        title: cvData.title,
+        summary: cvData.summary,
+        experience: cvData.experience as any,
+        education: cvData.education as any,
+        skills: cvData.skills as any,
+        languages: cvData.languages as any,
       };
 
       if (id && id !== "new") {

@@ -1,37 +1,7 @@
 import React from 'react';
+import type { CVTemplateProps } from '@/types/cv';
 
-interface CVData {
-  name: string;
-  email: string;
-  phone: string;
-  title: string;
-  photo?: string;
-  summary: string;
-  experience: Array<{
-    title: string;
-    company: string;
-    period: string;
-    description: string;
-  }>;
-  education: Array<{
-    degree: string;
-    school: string;
-    year: string;
-  }>;
-  skills: string[];
-  languages: Array<{
-    language: string;
-    level: string;
-  }>;
-  interests: string[];
-}
-
-interface CVTemplate3Props {
-  data: CVData;
-  accentColor?: string;
-}
-
-const CVTemplate3: React.FC<CVTemplate3Props> = ({ data, accentColor = '#8B5CF6' }) => {
+const CVTemplate3: React.FC<CVTemplateProps> = ({ data, accentColor = '#8B5CF6' }) => {
   return (
     <div className="bg-white w-[210mm] h-[297mm] shadow-lg mx-auto" id="cv-content">
       <div className="h-48 p-8 flex items-center gap-6 text-white" style={{ backgroundColor: accentColor }}>
