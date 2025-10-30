@@ -19,52 +19,82 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY not configured');
     }
 
-    const promptFr = `Tu es un expert en rédaction de CV. Génère uniquement les SECTIONS demandées sans inventer d'informations personnelles. Utilise le français.
+    const promptFr = `Tu es un expert en rédaction de CV professionnels. Crée un CV COMPLET et RICHE en contenu.
 
+INFORMATIONS FOURNIES:
 Nom: ${basicInfo.name || ''}
 Email: ${basicInfo.email || ''}
 Téléphone: ${basicInfo.phone || ''}
 Titre/Poste: ${basicInfo.title || ''}
-Expérience (indice libre): ${basicInfo.experience || ''}
-Formation (indice libre): ${basicInfo.education || ''}
+Expérience mentionnée: ${basicInfo.experience || 'À déduire du poste'}
+Formation mentionnée: ${basicInfo.education || 'À déduire du poste'}
 
-Règles STRICTES:
-- N'invente JAMAIS d'entreprises, de dates, d'écoles ou de diplômes
-- Si une info n'est pas fournie, laisse les tableaux vides et n'ajoute pas d'éléments fictifs
-- Le résumé doit rester générique et lié au titre (sans détails inventés)
+RÈGLES DE GÉNÉRATION:
+- Génère un résumé professionnel percutant de 3-4 phrases
+- Crée 3-4 expériences professionnelles DÉTAILLÉES et COHÉRENTES avec le poste
+- Ajoute 2-3 formations pertinentes pour le profil
+- Liste 8-12 compétences (techniques + soft skills) appropriées au poste
+- Inclus 2-3 langues avec niveaux réalistes (Natif, Courant, Intermédiaire, Notions)
+- Ajoute 3-5 centres d'intérêt professionnels
+- Base-toi sur le titre du poste pour créer un profil COHÉRENT
+- Sois créatif mais LOGIQUE et PROFESSIONNEL
 
 Retourne UNIQUEMENT un JSON valide au format:
 {
-  "summary": "string",
-  "experience": [],
-  "education": [],
-  "skills": [],
-  "languages": [],
-  "interests": []
+  "summary": "Résumé professionnel détaillé de 3-4 phrases",
+  "experience": [
+    {"title": "Poste", "company": "Entreprise", "period": "2021-2024", "description": "Description détaillée des responsabilités et réalisations"},
+    {"title": "Poste précédent", "company": "Autre entreprise", "period": "2018-2021", "description": "Description détaillée"}
+  ],
+  "education": [
+    {"degree": "Diplôme principal", "school": "École/Université", "year": "2018"},
+    {"degree": "Formation complémentaire", "school": "Institution", "year": "2016"}
+  ],
+  "skills": ["Compétence 1", "Compétence 2", "Compétence 3", "Compétence 4", "Compétence 5", "Compétence 6", "Compétence 7", "Compétence 8"],
+  "languages": [
+    {"language": "Français", "level": "Natif"},
+    {"language": "Anglais", "level": "Courant"}
+  ],
+  "interests": ["Intérêt 1", "Intérêt 2", "Intérêt 3"]
 }`;
 
-    const promptEn = `You are a resume expert. Generate ONLY the REQUESTED SECTIONS without fabricating any personal details. Use English.
+    const promptEn = `You are a professional resume writing expert. Create a COMPLETE and CONTENT-RICH CV.
 
+PROVIDED INFORMATION:
 Name: ${basicInfo.name || ''}
 Email: ${basicInfo.email || ''}
 Phone: ${basicInfo.phone || ''}
 Title: ${basicInfo.title || ''}
-Experience (free hint): ${basicInfo.experience || ''}
-Education (free hint): ${basicInfo.education || ''}
+Mentioned experience: ${basicInfo.experience || 'To infer from position'}
+Mentioned education: ${basicInfo.education || 'To infer from position'}
 
-STRICT Rules:
-- NEVER invent companies, dates, schools, or degrees
-- If info is missing, keep arrays empty and do NOT add made-up items
-- Summary must be generic and tied to the title (no fabricated specifics)
+GENERATION RULES:
+- Generate an impactful professional summary of 3-4 sentences
+- Create 3-4 DETAILED professional experiences COHERENT with the position
+- Add 2-3 relevant education entries for the profile
+- List 8-12 skills (technical + soft skills) appropriate for the position
+- Include 2-3 languages with realistic levels (Native, Fluent, Intermediate, Basic)
+- Add 3-5 professional interests
+- Base on the job title to create a COHERENT profile
+- Be creative but LOGICAL and PROFESSIONAL
 
-Return ONLY valid JSON in this shape:
+Return ONLY valid JSON in this format:
 {
-  "summary": "string",
-  "experience": [],
-  "education": [],
-  "skills": [],
-  "languages": [],
-  "interests": []
+  "summary": "Detailed professional summary of 3-4 sentences",
+  "experience": [
+    {"title": "Position", "company": "Company", "period": "2021-2024", "description": "Detailed description of responsibilities and achievements"},
+    {"title": "Previous position", "company": "Other company", "period": "2018-2021", "description": "Detailed description"}
+  ],
+  "education": [
+    {"degree": "Main degree", "school": "School/University", "year": "2018"},
+    {"degree": "Additional training", "school": "Institution", "year": "2016"}
+  ],
+  "skills": ["Skill 1", "Skill 2", "Skill 3", "Skill 4", "Skill 5", "Skill 6", "Skill 7", "Skill 8"],
+  "languages": [
+    {"language": "English", "level": "Native"},
+    {"language": "Spanish", "level": "Fluent"}
+  ],
+  "interests": ["Interest 1", "Interest 2", "Interest 3"]
 }`;
 
     const prompt = language === 'en' ? promptEn : promptFr;
