@@ -71,27 +71,8 @@ const Dashboard = () => {
     navigate("/auth");
   };
 
-  const createNewCV = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("cvs")
-        .insert([
-          {
-            user_id: user?.id,
-            title: "Nouveau CV",
-            full_name: user?.user_metadata?.full_name || "",
-            email: user?.email || "",
-          },
-        ])
-        .select()
-        .single();
-
-      if (error) throw error;
-      toast.success("CV créé avec succès");
-      navigate(`/editor/${data.id}`);
-    } catch (error: any) {
-      toast.error("Erreur lors de la création du CV");
-    }
+  const createNewCV = () => {
+    navigate('/editor/new');
   };
 
   const deleteCV = async (id: string) => {

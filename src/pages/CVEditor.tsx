@@ -69,6 +69,9 @@ const CVEditor = () => {
   useEffect(() => {
     if (id && id !== "new") {
       loadCV();
+    } else {
+      // Nouveau CV - toujours commencer par le formulaire
+      setStep('form');
     }
   }, [id]);
 
@@ -95,7 +98,8 @@ const CVEditor = () => {
           languages: (data.languages as any) || [],
           interests: [],
         });
-        setStep('preview');
+        // Toujours commencer par la galerie pour voir le CV chargé
+        setStep('gallery');
       }
     } catch (error: any) {
       toast({
@@ -205,20 +209,34 @@ const CVEditor = () => {
           .eq("id", id);
 
         if (error) throw error;
+        
+        toast({
+          title: language === 'fr' ? "CV sauvegardé" : "CV saved",
+          description: language === 'fr' ? "Votre CV a été enregistré avec succès" : "Your CV has been saved successfully",
+        });
       } else {
-        const { error } = await supabase.from("cvs").insert(cvToSave);
+        const { data: newCV, error } = await supabase
+          .from("cvs")
+          .insert(cvToSave)
+          .select()
+          .single();
+          
         if (error) throw error;
+        
+        toast({
+          title: language === 'fr' ? "CV créé et sauvegardé" : "CV created and saved",
+          description: language === 'fr' ? "Votre CV a été créé avec succès" : "Your CV has been created successfully",
+        });
+        
+        // Mettre à jour l'URL avec le nouvel ID
+        navigate(`/editor/${newCV.id}`, { replace: true });
+        return; // Ne pas rediriger vers le dashboard
       }
-
-      toast({
-        title: "CV sauvegardé",
-        description: "Votre CV a été enregistré avec succès",
-      });
 
       navigate("/dashboard");
     } catch (error: any) {
       toast({
-        title: "Erreur",
+        title: language === 'fr' ? "Erreur" : "Error",
         description: error.message,
         variant: "destructive",
       });
@@ -537,8 +555,10 @@ const CVEditor = () => {
               </div>
             </div>
 
-            <div className="flex justify-center" id="cv-content">
-              <TemplateComponent data={cvData} accentColor={currentColor} />
+            <div className="bg-card rounded-lg p-8 shadow-elegant">
+              <div className="flex justify-center" id="cv-content">
+                <TemplateComponent data={cvData} accentColor={currentColor} />
+              </div>
             </div>
           </div>
         </div>
