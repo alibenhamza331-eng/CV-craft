@@ -6,7 +6,8 @@ export interface CVData {
   photo?: string;
   summary: string;
   experience: Array<{
-    title: string;
+    title?: string;
+    position?: string;
     company: string;
     period: string;
     description: string;
@@ -14,13 +15,16 @@ export interface CVData {
   education: Array<{
     degree: string;
     school: string;
-    year: string;
+    year?: string;
+    period?: string;
+    description?: string;
   }>;
   skills: string[];
   languages: Array<{
-    language: string;
+    language?: string;
+    name?: string;
     level: string;
-  }>;
+  }> | string[];
   interests: string[];
 }
 
