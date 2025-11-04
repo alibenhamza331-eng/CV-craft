@@ -1,19 +1,31 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Download, ChevronLeft, ChevronRight, Sparkles, Camera, Palette } from "lucide-react";
+import type { CVData } from '@/types/cv';
 import CVTemplate1 from "@/components/cv/CVTemplate1";
 import CVTemplate2 from "@/components/cv/CVTemplate2";
 import CVTemplate3 from "@/components/cv/CVTemplate3";
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
-import type { CVData } from '@/types/cv';
+import CVTemplate4 from "@/components/cv/CVTemplate4";
+import CVTemplate5 from "@/components/cv/CVTemplate5";
+import CVTemplate6 from "@/components/cv/CVTemplate6";
+import CVTemplate7 from "@/components/cv/CVTemplate7";
+import CVTemplate8 from "@/components/cv/CVTemplate8";
+import CVTemplate9 from "@/components/cv/CVTemplate9";
+import CVTemplate10 from "@/components/cv/CVTemplate10";
+import { FormStep } from "@/components/cv-editor/FormStep";
+import { EditStep } from "@/components/cv-editor/EditStep";
+import { GalleryStep } from "@/components/cv-editor/GalleryStep";
+import { CustomizeStep } from "@/components/cv-editor/CustomizeStep";
+import { ExportStep } from "@/components/cv-editor/ExportStep";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, Sparkles } from "lucide-react";
 
-const templates = [CVTemplate1, CVTemplate2, CVTemplate3];
+const templates = [
+  CVTemplate1, CVTemplate2, CVTemplate3, CVTemplate4, CVTemplate5,
+  CVTemplate6, CVTemplate7, CVTemplate8, CVTemplate9, CVTemplate10
+];
+
 const colorPalettes = [
   { name: 'Violet', color: '#8B5CF6' },
   { name: 'Bleu', color: '#3B82F6' },
@@ -29,13 +41,15 @@ const colorPalettes = [
   { name: 'Lime', color: '#84CC16' },
   { name: 'Sky', color: '#0EA5E9' },
   { name: 'Teal', color: '#14B8A6' },
+  { name: 'Slate', color: '#64748B' },
+  { name: 'Zinc', color: '#71717A' },
 ];
 
 const CVEditor = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [step, setStep] = useState<'form' | 'generate' | 'gallery' | 'customize' | 'preview'>('form');
+  const [step, setStep] = useState<'form' | 'generate' | 'edit' | 'gallery' | 'customize' | 'export'>('form');
   const [language, setLanguage] = useState<'fr' | 'en'>('fr');
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
@@ -70,7 +84,6 @@ const CVEditor = () => {
     if (id && id !== "new") {
       loadCV();
     } else {
-      // Nouveau CV - toujours commencer par le formulaire
       setStep('form');
     }
   }, [id]);
@@ -98,8 +111,7 @@ const CVEditor = () => {
           languages: (data.languages as any) || [],
           interests: [],
         });
-        // Toujours commencer par la galerie pour voir le CV chargé
-        setStep('gallery');
+        setStep('edit');
       }
     } catch (error: any) {
       toast({
@@ -166,7 +178,7 @@ const CVEditor = () => {
         description: language === 'fr' ? "Votre CV a été créé avec l'IA" : "Your CV has been created with AI",
       });
       
-      setStep('gallery');
+      setStep('edit');
     } catch (error: any) {
       toast({
         title: "Erreur",
@@ -228,9 +240,8 @@ const CVEditor = () => {
           description: language === 'fr' ? "Votre CV a été créé avec succès" : "Your CV has been created successfully",
         });
         
-        // Mettre à jour l'URL avec le nouvel ID
         navigate(`/editor/${newCV.id}`, { replace: true });
-        return; // Ne pas rediriger vers le dashboard
+        return;
       }
 
       navigate("/dashboard");
@@ -245,198 +256,30 @@ const CVEditor = () => {
     }
   };
 
-  const downloadCV = async () => {
-    const element = document.getElementById("cv-content");
-    if (!element) return;
-
-    try {
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-      });
-
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      });
-
-      const imgWidth = 210;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-      pdf.save(`${cvData.name || 'cv'}.pdf`);
-
-      toast({
-        title: "Téléchargé!",
-        description: "Votre CV a été téléchargé",
-      });
-    } catch (error) {
-      toast({
-        title: "Erreur",
-        description: "Erreur lors du téléchargement",
-        variant: "destructive",
-      });
-    }
-  };
-
   const TemplateComponent = templates[selectedTemplate];
   const currentColor = colorPalettes[selectedColor].color;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-secondary/20 to-background">
       {step === 'form' && (
-        <div className="min-h-screen flex items-center justify-center p-6">
-          <div className="max-w-2xl w-full bg-card rounded-lg shadow-elegant p-8 space-y-6">
-            <div className="text-center mb-6">
-              <h1 className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-2">
-                {language === 'fr' ? 'Créez votre CV avec l\'assistant IA' : 'Create your CV with AI assistant'}
-              </h1>
-              <p className="text-muted-foreground">
-                {language === 'fr' 
-                  ? 'L\'IA génère un CV complet et professionnel à partir de vos informations' 
-                  : 'AI generates a complete and professional CV from your information'}
-              </p>
-            </div>
-
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">
-                  {language === 'fr' ? 'Langue:' : 'Language:'}
-                </span>
-                <div className="inline-flex rounded-md border">
-                  <button
-                    onClick={() => setLanguage('fr')}
-                    className={`px-3 py-1 text-sm rounded-l-md transition-colors ${language === 'fr' ? 'bg-primary text-primary-foreground' : 'hover:bg-secondary'}`}
-                  >🇫🇷 FR</button>
-                  <button
-                    onClick={() => setLanguage('en')}
-                    className={`px-3 py-1 text-sm rounded-r-md transition-colors ${language === 'en' ? 'bg-primary text-primary-foreground' : 'hover:bg-secondary'}`}
-                  >🇬🇧 EN</button>
-                </div>
-              </div>
-              <Button variant="outline" onClick={() => {
-                setBasicInfo({ name: '', email: '', phone: '', title: '', experience: '', education: '' });
-                setCvData({ name: '', email: '', phone: '', title: '', photo: '', summary: '', experience: [], education: [], skills: [], languages: [], interests: [] });
-                setPhotoUrl('');
-                setSelectedTemplate(0);
-                setSelectedColor(0);
-                setStep('form');
-              }}>
-                {language === 'fr' ? 'Tout remettre à zéro' : 'Reset all'}
-              </Button>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="photo" className="cursor-pointer">
-                  <div className="flex items-center gap-3 p-4 border-2 border-dashed rounded-lg hover:border-primary transition-colors">
-                    <Camera className="w-6 h-6" />
-                    <div>
-                      <p className="font-medium">
-                        {language === 'fr' ? 'Ajouter une photo' : 'Add a photo'}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {language === 'fr' ? 'Optionnel mais recommandé' : 'Optional but recommended'}
-                      </p>
-                    </div>
-                  </div>
-                  <input
-                    id="photo"
-                    type="file"
-                    accept="image/*"
-                    onChange={handlePhotoUpload}
-                    className="hidden"
-                  />
-                </Label>
-                {photoUrl && (
-                  <img src={photoUrl} alt="Preview" className="mt-2 w-24 h-24 rounded-full object-cover" />
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="name">
-                  {language === 'fr' ? 'Nom complet *' : 'Full name *'}
-                </Label>
-                <Input
-                  id="name"
-                  value={basicInfo.name}
-                  onChange={(e) => setBasicInfo({ ...basicInfo, name: e.target.value })}
-                  placeholder={language === 'fr' ? 'Jean Dupont' : 'John Doe'}
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={basicInfo.email}
-                    onChange={(e) => setBasicInfo({ ...basicInfo, email: e.target.value })}
-                    placeholder={language === 'fr' ? 'jean@email.com' : 'john@email.com'}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="phone">
-                    {language === 'fr' ? 'Téléphone' : 'Phone'}
-                  </Label>
-                  <Input
-                    id="phone"
-                    value={basicInfo.phone}
-                    onChange={(e) => setBasicInfo({ ...basicInfo, phone: e.target.value })}
-                    placeholder={language === 'fr' ? '+33 6 12 34 56 78' : '+1 555 000 0000'}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <Label htmlFor="title">
-                  {language === 'fr' ? 'Titre / Poste recherché *' : 'Title / Target position *'}
-                </Label>
-                <Input
-                  id="title"
-                  value={basicInfo.title}
-                  onChange={(e) => setBasicInfo({ ...basicInfo, title: e.target.value })}
-                  placeholder={language === 'fr' ? 'Développeur Full Stack' : 'Full Stack Developer'}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="experience">
-                  {language === 'fr' ? 'Expérience (résumé rapide)' : 'Experience (quick summary)'}
-                </Label>
-                <Input
-                  id="experience"
-                  value={basicInfo.experience}
-                  onChange={(e) => setBasicInfo({ ...basicInfo, experience: e.target.value })}
-                  placeholder={language === 'fr' ? '3 ans en développement web' : '3 years in web development'}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="education">
-                  {language === 'fr' ? 'Formation' : 'Education'}
-                </Label>
-                <Input
-                  id="education"
-                  value={basicInfo.education}
-                  onChange={(e) => setBasicInfo({ ...basicInfo, education: e.target.value })}
-                  placeholder={language === 'fr' ? 'Master Informatique' : 'Master in Computer Science'}
-                />
-              </div>
-            </div>
-
-            <Button onClick={generateWithAI} disabled={generating} className="w-full gap-2">
-              <Sparkles className="w-4 h-4" />
-              {generating 
-                ? (language === 'fr' ? 'Génération en cours...' : 'Generating...') 
-                : (language === 'fr' ? 'Générer mon CV avec l\'IA' : 'Generate my CV with AI')}
-            </Button>
-          </div>
-        </div>
+        <FormStep
+          language={language}
+          setLanguage={setLanguage}
+          basicInfo={basicInfo}
+          setBasicInfo={setBasicInfo}
+          photoUrl={photoUrl}
+          onPhotoUpload={handlePhotoUpload}
+          generating={generating}
+          onGenerate={generateWithAI}
+          onReset={() => {
+            setBasicInfo({ name: '', email: '', phone: '', title: '', experience: '', education: '' });
+            setCvData({ name: '', email: '', phone: '', title: '', photo: '', summary: '', experience: [], education: [], skills: [], languages: [], interests: [] });
+            setPhotoUrl('');
+            setSelectedTemplate(0);
+            setSelectedColor(0);
+            setStep('form');
+          }}
+        />
       )}
 
       {step === 'generate' && (
@@ -453,115 +296,52 @@ const CVEditor = () => {
         </div>
       )}
 
-      {step === 'gallery' && (
-        <div className="min-h-screen p-6">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold mb-2">
-                {language === 'fr' ? 'Choisissez votre template' : 'Choose your template'}
-              </h2>
-              <p className="text-muted-foreground">
-                {language === 'fr' ? 'Cliquez sur un design pour le sélectionner' : 'Click on a design to select it'}
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {templates.map((Template, idx) => (
-                <div
-                  key={idx}
-                  onClick={() => setSelectedTemplate(idx)}
-                  className={`cursor-pointer transform transition-all duration-300 hover:scale-105 ${
-                    idx === selectedTemplate 
-                      ? 'ring-4 ring-primary shadow-[var(--shadow-glow)] scale-105' 
-                      : 'hover:shadow-[var(--shadow-elegant)]'
-                  }`}
-                >
-                  <div className="scale-[0.4] origin-top-left h-[420px] overflow-hidden rounded-lg border-2">
-                    <Template data={cvData} accentColor={currentColor} />
-                  </div>
-                  <p className="text-center mt-2 font-medium">
-                    Template {idx + 1}
-                  </p>
-                </div>
-              ))}
-            </div>
+      {step === 'edit' && (
+        <EditStep
+          language={language}
+          cvData={cvData}
+          onCvDataChange={setCvData}
+          onNext={() => setStep('gallery')}
+          onSave={saveCV}
+          loading={loading}
+        />
+      )}
 
-            <div className="flex justify-center gap-4">
-              <Button variant="outline" onClick={() => setStep('form')}>
-                {language === 'fr' ? 'Retour' : 'Back'}
-              </Button>
-              <Button onClick={() => setStep('customize')} className="gap-2">
-                {language === 'fr' ? 'Personnaliser' : 'Customize'}
-                <Palette className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-        </div>
+      {step === 'gallery' && (
+        <GalleryStep
+          language={language}
+          cvData={cvData}
+          selectedTemplate={selectedTemplate}
+          setSelectedTemplate={setSelectedTemplate}
+          currentColor={currentColor}
+          onBack={() => setStep('edit')}
+          onNext={() => setStep('customize')}
+        />
       )}
 
       {step === 'customize' && (
-        <div className="min-h-screen flex flex-col items-center justify-center p-6">
-          <h2 className="text-3xl font-bold mb-6">
-            {language === 'fr' ? 'Personnalisez les couleurs' : 'Customize colors'}
-          </h2>
-          
-          <div className="scale-75 transform mb-8">
-            <TemplateComponent data={cvData} accentColor={currentColor} />
-          </div>
-
-          <div className="grid grid-cols-4 md:grid-cols-8 gap-4 mb-8 max-w-2xl">
-            {colorPalettes.map((palette, idx) => (
-              <button
-                key={idx}
-                onClick={() => setSelectedColor(idx)}
-                className={`w-12 h-12 rounded-full transition-all ${
-                  idx === selectedColor ? 'ring-4 ring-primary ring-offset-4 scale-110' : 'hover:scale-105'
-                }`}
-                style={{ backgroundColor: palette.color }}
-                title={palette.name}
-              />
-            ))}
-          </div>
-
-          <div className="flex gap-4">
-            <Button variant="outline" onClick={() => setStep('gallery')}>
-              {language === 'fr' ? 'Retour' : 'Back'}
-            </Button>
-            <Button onClick={() => setStep('preview')}>
-              {language === 'fr' ? 'Voir le résultat' : 'See result'}
-            </Button>
-          </div>
-        </div>
+        <CustomizeStep
+          language={language}
+          cvData={cvData}
+          selectedTemplate={selectedTemplate}
+          selectedColor={selectedColor}
+          setSelectedColor={setSelectedColor}
+          currentColor={currentColor}
+          onNext={() => setStep('export')}
+          onBack={() => setStep('gallery')}
+          templateComponent={TemplateComponent}
+        />
       )}
 
-      {step === 'preview' && (
-        <div className="p-6">
-          <div className="max-w-7xl mx-auto">
-            <div className="flex items-center justify-between mb-8">
-              <Button variant="ghost" onClick={() => setStep('customize')} className="gap-2">
-                <ArrowLeft className="w-4 h-4" />
-                {language === 'fr' ? 'Retour' : 'Back'}
-              </Button>
-              <div className="flex gap-2">
-                <Button onClick={saveCV} disabled={loading} variant="outline">
-                  {loading 
-                    ? (language === 'fr' ? 'Enregistrement...' : 'Saving...') 
-                    : (language === 'fr' ? 'Enregistrer' : 'Save')}
-                </Button>
-                <Button onClick={downloadCV} className="gap-2">
-                  <Download className="w-4 h-4" />
-                  {language === 'fr' ? 'Télécharger PDF' : 'Download PDF'}
-                </Button>
-              </div>
-            </div>
-
-            <div className="bg-card rounded-lg p-8 shadow-elegant">
-              <div className="flex justify-center" id="cv-content">
-                <TemplateComponent data={cvData} accentColor={currentColor} />
-              </div>
-            </div>
-          </div>
-        </div>
+      {step === 'export' && (
+        <ExportStep
+          language={language}
+          cvData={cvData}
+          cvId={id}
+          accentColor={currentColor}
+          templateComponent={TemplateComponent}
+          onBack={() => setStep('customize')}
+        />
       )}
     </div>
   );

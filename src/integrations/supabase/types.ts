@@ -24,14 +24,17 @@ export type Database = {
           experience: Json | null
           full_name: string
           id: string
+          is_public: boolean | null
           languages: Json | null
           linkedin: string | null
           phone: string | null
+          share_token: string | null
           skills: Json | null
           summary: string | null
           title: string
           updated_at: string
           user_id: string
+          version_name: string | null
           website: string | null
         }
         Insert: {
@@ -43,14 +46,17 @@ export type Database = {
           experience?: Json | null
           full_name: string
           id?: string
+          is_public?: boolean | null
           languages?: Json | null
           linkedin?: string | null
           phone?: string | null
+          share_token?: string | null
           skills?: Json | null
           summary?: string | null
           title?: string
           updated_at?: string
           user_id: string
+          version_name?: string | null
           website?: string | null
         }
         Update: {
@@ -62,14 +68,17 @@ export type Database = {
           experience?: Json | null
           full_name?: string
           id?: string
+          is_public?: boolean | null
           languages?: Json | null
           linkedin?: string | null
           phone?: string | null
+          share_token?: string | null
           skills?: Json | null
           summary?: string | null
           title?: string
           updated_at?: string
           user_id?: string
+          version_name?: string | null
           website?: string | null
         }
         Relationships: []
@@ -103,7 +112,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_share_token: { Args: never; Returns: string }
     }
     Enums: {
       [_ in never]: never

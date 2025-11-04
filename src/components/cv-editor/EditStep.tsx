@@ -10,18 +10,19 @@ import type { CVData } from '@/types/cv';
 interface EditStepProps {
   language: 'fr' | 'en';
   cvData: CVData;
-  onUpdate: (data: CVData) => void;
+  onCvDataChange: (data: CVData) => void;
   onNext: () => void;
-  onBack: () => void;
+  onSave: () => Promise<void>;
+  loading: boolean;
 }
 
-export const EditStep = ({ language, cvData, onUpdate, onNext, onBack }: EditStepProps) => {
+export const EditStep = ({ language, cvData, onCvDataChange, onNext, onSave, loading }: EditStepProps) => {
   const [localData, setLocalData] = useState<CVData>(cvData);
 
   const updateField = (field: keyof CVData, value: any) => {
     const updated = { ...localData, [field]: value };
     setLocalData(updated);
-    onUpdate(updated);
+    onCvDataChange(updated);
   };
 
   const addExperience = () => {
@@ -265,8 +266,10 @@ export const EditStep = ({ language, cvData, onUpdate, onNext, onBack }: EditSte
         </Card>
 
         <div className="flex justify-between pt-4">
-          <Button variant="outline" onClick={onBack}>
-            {language === 'fr' ? 'Retour' : 'Back'}
+          <Button variant="outline" onClick={onSave} disabled={loading}>
+            {loading 
+              ? (language === 'fr' ? 'Enregistrement...' : 'Saving...') 
+              : (language === 'fr' ? 'Enregistrer' : 'Save')}
           </Button>
           <Button onClick={onNext} className="gap-2">
             {language === 'fr' ? 'Choisir le design' : 'Choose design'}
