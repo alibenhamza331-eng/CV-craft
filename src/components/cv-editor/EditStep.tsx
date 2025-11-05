@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Plus, Trash2, ArrowRight } from "lucide-react";
 import type { CVData } from '@/types/cv';
+import { LanguageManager } from "./LanguageManager";
 
 interface EditStepProps {
   language: 'fr' | 'en';
@@ -69,15 +70,25 @@ export const EditStep = ({ language, cvData, onCvDataChange, onNext, onSave, loa
     updateField('skills', value.split(',').map(s => s.trim()).filter(Boolean));
   };
 
-  const updateLanguages = (value: string) => {
-    const langs = value.split(',').map(s => s.trim()).filter(Boolean);
-    updateField('languages', langs.map(lang => {
-      if (Array.isArray(localData.languages)) {
-        const existing = localData.languages.find(l => typeof l === 'object' && (l.name === lang || l.language === lang));
-        return existing || { name: lang, language: lang, level: 'Intermédiaire' };
-      }
-      return { name: lang, language: lang, level: 'Intermédiaire' };
-    }));
+  const addLanguage = () => {
+    const currentLangs = Array.isArray(localData.languages) ? localData.languages : [];
+    updateField('languages', [...currentLangs, { name: '', language: '', level: 'Intermédiaire' }]);
+  };
+
+  const removeLanguage = (index: number) => {
+    const currentLangs = Array.isArray(localData.languages) ? localData.languages : [];
+    updateField('languages', currentLangs.filter((_, i) => i !== index));
+  };
+
+  const updateLanguage = (index: number, field: string, value: string) => {
+    const currentLangs = Array.isArray(localData.languages) ? localData.languages : [];
+    const updated = [...currentLangs];
+    if (typeof updated[index] === 'object') {
+      updated[index] = { ...updated[index], [field]: value };
+      if (field === 'name') updated[index].language = value;
+      if (field === 'language') updated[index].name = value;
+    }
+    updateField('languages', updated);
   };
 
   return (
@@ -243,7 +254,7 @@ export const EditStep = ({ language, cvData, onCvDataChange, onNext, onSave, loa
         </Card>
 
         <Card className="p-6 space-y-4">
-          <h3 className="text-xl font-semibold">{language === 'fr' ? 'Compétences & Langues' : 'Skills & Languages'}</h3>
+          <h3 className="text-xl font-semibold">{language === 'fr' ? 'Compétences' : 'Skills'}</h3>
           
           <div>
             <Label>{language === 'fr' ? 'Compétences (séparées par des virgules)' : 'Skills (comma separated)'}</Label>
@@ -254,16 +265,24 @@ export const EditStep = ({ language, cvData, onCvDataChange, onNext, onSave, loa
               rows={3}
             />
           </div>
-
-          <div>
-            <Label>{language === 'fr' ? 'Langues (séparées par des virgules)' : 'Languages (comma separated)'}</Label>
-            <Input 
-              value={Array.isArray(localData.languages) ? localData.languages.map(l => typeof l === 'string' ? l : (l.name || l.language || '')).join(', ') : ''}
-              onChange={(e) => updateLanguages(e.target.value)}
-              placeholder="Français, Anglais, Espagnol..."
-            />
-          </div>
         </Card>
+
+        <LanguageManager
+          languages={Array.isArray(localData.languages) ? localData.languages.map(l => 
+            typeof l === 'string' ? { name: l, language: l, level: 'Intermédiaire' } : l
+          ) : []}
+          onChange={(langs) => updateField('languages', langs)}
+          langText={{
+            title: language === 'fr' ? 'Langues' : 'Languages',
+            add: language === 'fr' ? 'Ajouter' : 'Add',
+            languagePlaceholder: language === 'fr' ? 'Langue' : 'Language',
+            levelLabel: language === 'fr' ? 'Niveau' : 'Level',
+            beginner: language === 'fr' ? 'Débutant' : 'Beginner',
+            intermediate: language === 'fr' ? 'Intermédiaire' : 'Intermediate',
+            advanced: language === 'fr' ? 'Avancé' : 'Advanced',
+            native: language === 'fr' ? 'Natif' : 'Native',
+          }}
+        />
 
         <div className="flex justify-between pt-4">
           <Button variant="outline" onClick={onSave} disabled={loading}>
