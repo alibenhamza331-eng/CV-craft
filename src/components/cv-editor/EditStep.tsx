@@ -267,6 +267,21 @@ export const EditStep = ({ language, cvData, onCvDataChange, onNext, onSave, loa
           </div>
         </Card>
 
+        <Card className="p-6 space-y-4">
+          <h3 className="text-xl font-semibold">{language === 'fr' ? 'Centres d\'intérêt' : 'Interests'}</h3>
+          
+          <div>
+            <Label>{language === 'fr' ? 'Centres d\'intérêt (séparés par des virgules)' : 'Interests (comma separated)'}</Label>
+            <Textarea 
+              value={localData.interests.join(', ')}
+              onChange={(e) => updateField('interests', e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
+              placeholder={language === 'fr' ? 'Photographie, Voyages, Sport, Lecture...' : 'Photography, Travel, Sports, Reading...'}
+              rows={3}
+            />
+          </div>
+        </Card>
+
+
         <LanguageManager
           languages={Array.isArray(localData.languages) ? localData.languages.map(l => 
             typeof l === 'string' ? { name: l, language: l, level: 'Intermédiaire' } : l
