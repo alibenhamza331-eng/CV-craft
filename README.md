@@ -1,22 +1,12 @@
-# Welcome to your Lovable project
+# CVCraft - Créateur de CV Professionnel
 
-## Project info
+## À propos du projet
 
-**URL**: https://lovable.dev/projects/1fb240e4-db47-49d7-b24b-d34294959034
+CVCraft est une application web moderne pour créer des CV professionnels avec l'aide de l'IA.
 
-## How can I edit this code?
+## Comment éditer ce code ?
 
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/1fb240e4-db47-49d7-b24b-d34294959034) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+**Utiliser votre IDE préféré**
 
 The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
@@ -50,9 +40,9 @@ npm run dev
 - Click on "New codespace" to launch a new Codespace environment.
 - Edit files directly within the Codespace and commit and push your changes once you're done.
 
-## What technologies are used for this project?
+## Technologies utilisées
 
-This project is built with:
+Ce projet utilise :
 
 - Vite
 - TypeScript
@@ -60,14 +50,6 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
-## How can I deploy this project?
+## Déploiement
 
-Simply open [Lovable](https://lovable.dev/projects/1fb240e4-db47-49d7-b24b-d34294959034) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Déployez facilement sur Netlify en poussant votre code sur GitHub et en connectant votre dépôt à Netlify.
