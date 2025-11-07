@@ -14,7 +14,7 @@ const Index = () => {
         </div>
         
         <h1 className="text-6xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent mb-4 animate-scale-in">
-          CV Pro Generator
+          CVCraft
         </h1>
         
         <p className="text-xl text-muted-foreground mb-8 animate-fade-in">
