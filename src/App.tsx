@@ -3,11 +3,11 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import Auth from "./pages/Auth";
-import Dashboard from "./pages/Dashboard";
-import CVEditor from "./pages/CVEditor";
-import PublicCV from "./pages/PublicCV";
+import HomePage from "./pages/HomePage";
+import AuthenticationPage from "./pages/AuthenticationPage";
+import UserDashboard from "./pages/UserDashboard";
+import CVEditorPage from "./pages/CVEditorPage";
+import PublicCVViewer from "./pages/PublicCVViewer";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -19,11 +19,11 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/editor/:id" element={<CVEditor />} />
-          <Route path="/cv/:token" element={<PublicCV />} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/auth" element={<AuthenticationPage />} />
+          <Route path="/dashboard" element={<UserDashboard />} />
+          <Route path="/editor/:id" element={<CVEditorPage />} />
+          <Route path="/cv/:token" element={<PublicCVViewer />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
