@@ -10,13 +10,13 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { FileText, Sparkles } from "lucide-react";
 
-const emailSchema = z.string().trim().email({ message: "Email invalide" });
+const usernameSchema = z.string().min(3, { message: "Minimum 3 caractères" });
 const passwordSchema = z.string().min(6, { message: "Minimum 6 caractères" });
 
 const Auth = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
 
@@ -28,12 +28,17 @@ const Auth = () => {
     });
   }, [navigate]);
 
+  // Convertit le username en email pour Supabase
+  const usernameToEmail = (user: string) => {
+    return `${user.toLowerCase()}@cvcraft.local`;
+  };
+
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      emailSchema.parse(email);
+      usernameSchema.parse(username);
       passwordSchema.parse(password);
       
       if (!fullName.trim()) {
@@ -42,18 +47,23 @@ const Auth = () => {
         return;
       }
 
+      const email = usernameToEmail(username);
+
       const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: { full_name: fullName },
+          data: { 
+            full_name: fullName,
+            username: username 
+          },
           emailRedirectTo: `${window.location.origin}/`,
         },
       });
 
       if (error) {
         if (error.message.includes("already registered")) {
-          toast.error("Cet email est déjà enregistré");
+          toast.error("Ce nom d'utilisateur est déjà pris");
         } else {
           toast.error(error.message);
         }
@@ -75,8 +85,10 @@ const Auth = () => {
     setIsLoading(true);
 
     try {
-      emailSchema.parse(email);
+      usernameSchema.parse(username);
       passwordSchema.parse(password);
+
+      const email = usernameToEmail(username);
 
       const { error } = await supabase.auth.signInWithPassword({
         email,
@@ -85,7 +97,7 @@ const Auth = () => {
 
       if (error) {
         if (error.message.includes("Invalid login credentials")) {
-          toast.error("Email ou mot de passe incorrect");
+          toast.error("Nom d'utilisateur ou mot de passe incorrect");
         } else {
           toast.error(error.message);
         }
@@ -111,7 +123,7 @@ const Auth = () => {
             <FileText className="w-8 h-8 text-primary-foreground" />
           </div>
           <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            CV Pro Generator
+            CVCraft Pro
           </CardTitle>
           <CardDescription className="flex items-center justify-center gap-2">
             <Sparkles className="w-4 h-4 text-accent" />
@@ -132,13 +144,13 @@ const Auth = () => {
             <TabsContent value="signin">
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signin-email">Email</Label>
+                  <Label htmlFor="signin-username">Nom d'utilisateur</Label>
                   <Input
-                    id="signin-email"
-                    type="email"
-                    placeholder="votre@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    id="signin-username"
+                    type="text"
+                    placeholder="Admin"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                     required
                     className="transition-all duration-200 focus:shadow-[var(--shadow-elegant)]"
                   />
@@ -180,13 +192,13 @@ const Auth = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
+                  <Label htmlFor="signup-username">Nom d'utilisateur</Label>
                   <Input
-                    id="signup-email"
-                    type="email"
-                    placeholder="votre@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    id="signup-username"
+                    type="text"
+                    placeholder="Admin"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                     required
                     className="transition-all duration-200 focus:shadow-[var(--shadow-elegant)]"
                   />

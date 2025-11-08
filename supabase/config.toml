@@ -2,3 +2,6 @@ project_id = "fqwogvxmojepyeypwwzm"
 
 [functions.generate-cv-content]
 verify_jwt = false
+
+[functions.create-admin]
+verify_jwt = false

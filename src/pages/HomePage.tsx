@@ -23,11 +23,6 @@ const Index = () => {
           <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Créez des CVs professionnels ultra-modernes en quelques minutes avec l'IA
           </p>
-
-          {/* Premium Badge */}
-          <div className="inline-block bg-gradient-to-r from-primary to-accent text-primary-foreground px-6 py-3 rounded-full shadow-lg">
-            <p className="font-semibold">✨ Toutes les fonctionnalités premium gratuites avec un compte</p>
-          </div>
           
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
@@ -37,7 +32,7 @@ const Index = () => {
               className="text-lg px-8 py-6 bg-gradient-to-r from-primary to-accent hover:opacity-90 shadow-lg hover:shadow-xl transition-all hover:scale-105"
             >
               <Sparkles className="mr-2 h-5 w-5" />
-              Commencer gratuitement
+              Commencer maintenant
             </Button>
             <Button 
               size="lg" 
@@ -108,7 +103,7 @@ const Index = () => {
             </div>
             <h3 className="text-xl font-bold mb-2">Fonctionnalités Pro</h3>
             <p className="text-muted-foreground">
-              Accès illimité à toutes les fonctionnalités premium
+              Accès aux templates premium et fonctionnalités avancées
             </p>
           </Card>
         </div>
@@ -126,7 +121,7 @@ const Index = () => {
               className="text-lg px-12 py-6 bg-gradient-to-r from-primary to-accent hover:opacity-90 shadow-lg hover:scale-105"
             >
               <Sparkles className="mr-2 h-5 w-5" />
-              Créer mon CV gratuitement
+              Créer mon CV
             </Button>
           </Card>
         </div>
